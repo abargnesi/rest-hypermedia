@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<!--
+vim: ts=2 sw=2:
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HTTP APIs with REST and Hypermedia</title>
+  <meta name="viewport" content="width=1024, user-scalable=no">
+
+  <script type="text/javascript">
+    WebFontConfig = {
+      google: { families: [ 'Patua+One::latin' ] }
+    };
+    (function() {
+      var wf = document.createElement('script');
+      wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+        '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+      wf.type = 'text/javascript';
+      wf.async = 'true';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(wf, s);
+    })();
+  </script>
+
+  <!-- Replace path with correct path to deck.core.css. -->
+  <link rel="stylesheet" href="core/deck.core.css" type="text/css">
+  <link rel="stylesheet" href="transition/horizontal-slide.css" type="text/css">
+  <link rel="stylesheet" href="style/grid.css" type="text/css">
+  <link rel="stylesheet" href="style/prettify.css" type="text/css">
+  <link rel="stylesheet" href="style/desert.css" type="text/css">
+  <link rel="stylesheet" href="style/colby.css" type="text/css">
+
+  <!-- Any other extension CSS files go here. -->
+
+  <!-- Replace path with correct path to Modernizr file. -->
+  <script src="modernizr.custom.js"></script>
+
+</head>
+<body class="deck-container">
+
+<!-- this is a presentation -->
+<section class="slide" id="start">
+  <div class="vcenter" id="start">
+    <h1>HTTP APIs</h1>
+    <h3>with REST and Hypermedia</h4>
+  </div>
+</section>
+
+<section class="slide" id="definitions">
+  <h2>Definitions</h2>
+  <h4><a href="http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a>: Hypertext Transfer Protol</h4>
+  <p>The communication of data for the world wide web in the form on logically-linked hypertext documents.</p>
+  <h4><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>: Representational State Transfer</h4>
+  <p>A set of architectural guidelines to follow when building HTTP APIs.</p>
+  <h4><a href="http://en.wikipedia.org/wiki/Hypermedia">Hypermedia</a></h4>
+  <p>An interaction style between client and server where content is completely driven by the server without <a href="http://en.wikipedia.org/wiki/Out-of-band_agreement"><em>out-of-band information</em></a>.</p>
+</section>
+
+<section class="slide" id="function-example">
+  <h2>Basic Example</h2>
+  <p>Modeling a catalogue of biological functions.</p>
+</section>
+
+<section class="slide" id="function-url">
+  <h2>The URL</h2>
+  <h5>GET /api/functions/proteinAbundance</h4>
+  <br/>
+  <p>/api<span style="float: right;"><em>API root path segment</em></span></p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;/functions<span style="float: right;"><em>All functions (e.g. resource collection)</em></p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/functions/proteinAbundance<span style="float: right;"><em>Single function (e.g. resource item)</em></p>
+  <ul>
+    <li><small>"proteinAbundance" can be seen as an identifier part for the function resource item, but the complete identifier would be the whole <a href="http://en.wikipedia.org/wiki/Uniform_resource_identifier">URI</a>.</small></li>
+    <li><small>Represents your API's conceptual hierarchy.</small></li>
+    <li><small>Human readable/hackable.</small></li>
+  </ul>
+</section>
+
+<section class="slide" id="function-linking">
+  <h2>Linking Resources with <a href="http://stateless.co/hal_specification.html" title="Hypertext Application Language">HAL</a></h2>
+  <p><strong>GET</strong> /api/functions/proteinAbundance</p>
+  <p><strong>Accept</strong>: application/hal+json; q=1.0, application/json; q=0.5</h6>
+  <pre class="prettyprint"><code>{
+    "function": {
+        "short_form": "p",
+        "long_form": "proteinAbundance",
+        "description": "Denotes the abundance of a protein",
+        "_links": {
+            "self": {
+                "href": "http://next.belframework.org/api/functions/proteinAbundance"
+            },
+            "collection": {
+                "href": "http://next.belframework.org/api/functions"
+            }
+        }
+    }
+}</code></pre>
+  <p>If the server cannot "accept" the media type the client expects then the HTTP status <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7"><em>406 Not Acceptable</em></a> is returned.</p>
+</section>
+
+<section class="slide" id="completion-example">
+  <h2>Cooler Example</h2>
+  <p>Server-driven syntax completion.</p>
+</section>
+
+<section class="slide" id="completion-url">
+  <h2>The URL</h2>
+  <p>A complete biological term could be: <em>p(HGNC:AKT1)</em></p>
+  <h5>GET /api/expressions/p(HG/completions</h4>
+  <br/>
+  <p>/api<span style="float: right;"><em>API root path segment</em></span></p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;/expressions<span style="float: right;"><em>All expressions</em></p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/p(HG<span style="float: right;"><em>Single ephemeral expression</em></p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/completions<span style="float: right;"><em>Possible syntax completions for expression</em></p>
+  <ul>
+    <li><small>Infinite expressions, but they are ephemeral for the life of the HTTP request.</li>
+  </ul>
+</section>
+
+<section class="slide" id="completion-linking">
+  <h2>Linking Resources with <a href="http://stateless.co/hal_specification.html" title="Hypertext Application Language">HAL</a></h2>
+  <p>A complete biological term could be: <em>p(HGNC:AKT1)</em></p>
+  <p><strong>GET</strong> /api/expressions/p(HG/completions</p>
+  <p><strong>Accept</strong>: application/hal+json; q=1.0, application/json; q=0.5</h6>
+  <pre class="prettyprint"><code>[
+    {
+        "completion": {
+            "type": "namespace prefix",
+            "label": "HGNC",
+            "value": "HGNC:",
+            "highlight": {
+                "position_start": 0,
+                "position_end": 3
+            },
+            "actions": [
+                {
+                    "delete": {
+                        "position": 2,
+                        "length": 3
+                    },
+                    "insert": {
+                        "position": 2,
+                        "value": "HGNC:"
+                    },
+                    "move_cursor": {
+                        "position": 7
+                    }
+                }
+            ]
+        }
+    }
+]</code></pre>
+</section>
+
+<section class="slide" id="demo">
+  <h2>Quick demonstration</h2>
+</section>
+
+<section class="slide" id="summary">
+  <h2>Summary</h2>
+  <ul>
+    <li>Design API's conceptual model following REST guidelines.</li>
+    <li>Link your model together for discovery and traversal.</li>
+    <li>Convey resource types (i.e. functions, expressions, completions) through media types and schema (i.e. XSD, JSON Schema, etc.).</li>
+    <li>Leverage "standards" to make your API more recognizable to clients.</li>
+    <li>Minimize client's need for out-of-band information.</li>
+  </ul>
+</section>
+
+<!-- Update these paths to point to the correct files. -->
+<script src="prettify/prettify.js"></script>
+<script src="jquery-1.7.min.js"></script>
+<script src="core/deck.core.js"></script>
+
+<!-- Add any other extension JS files here -->
+<script src="extensions/hash/deck.hash.js"></script>
+
+
+<!-- Initialize the deck. You can put this in an external file if desired. -->
+<script>
+  prettyPrint();
+  $(function() {
+    $.deck('.slide');
+  });
+</script>
+
+</body>
+</html>
