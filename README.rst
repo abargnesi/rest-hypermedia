@@ -1,4 +1,4 @@
-Talk - Semantic Web Meetup
+REST and Hypermedia Slides
 ==========================
 
 
